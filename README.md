@@ -1,1 +1,1 @@
-# hybrid-search-atlas-search-vectorsearch
+# Hybrid Search Capability with MongoDB Atlas - Search Engine & Vector Search Engine
