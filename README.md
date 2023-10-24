@@ -8,9 +8,6 @@
 * MongoDB Atlas Search
 * MongoDB Atlas Vector Search
 
-
-
-
 ### Step 1 : Import Cross-Market Recommendations dataset into your Atlas Database
 > Download the US Home and Kitchen/metadata category dataset.
 ```
@@ -23,11 +20,17 @@ COLLECTION_NAME = hybrid_search_dataset
 ```
 > Extract and import the data into the aforementioned collection using Compass or any other tools you see fit.
 
-### Step 2: Edit the 
+### Step 2: Edit the hybrid_search_encoding_data_module.py file
+> Update the MONGODB_ATLAS_URI parameter with your Atlas connection string.
+
+### Step 3: Run the the hybrid_search_encoding_data_module.py file
+> Ensure that you have installed the relevant Python package beforehand.
 ```
-Name = log_gen_server
-AMI = Amazon Linux 2 AMI (HVM) - kernel 5.10, SSD Volume Type
-Architecture = 64-bit (x86)
-Instance type = c5.4xlarge
-Inbound security rule = SSH (TCP, 22) from your IP
+pip install sentence-transformers
+pip install pymongo
+pip install numpy
+```
+> Run the script and then wait until completion.
+```
+python hybrid_search_encoding_data_module.py
 ```
