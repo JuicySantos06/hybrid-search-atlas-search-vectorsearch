@@ -5,14 +5,14 @@ import numpy
 
 #define global variables
 MONGODB_ATLAS_URI = "<EDIT_WITH_YOUR_PARAMETER>"
-DB_NAME = "sample_xmarket"
-COLLECTION_NAME = "homeAndKitchen"
+DB_NAME = "hybrid_search_xmarket"
+COLLECTION_NAME = "hybrid_search_dataset"
 MONGODB_CLIENT = MongoClient(MONGODB_ATLAS_URI)
 
 #define model to be used for encoding product title field
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-#define vector normalization - frobenius norm (numpy.linalg.norm(vectorData) is a generalization of the Euclidean norm for multi-dimensional arrays
+#define vector normalization
 def normalize_data(vectorData):
     return (vectorData/numpy.linalg.norm(vectorData))
 
