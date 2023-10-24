@@ -12,11 +12,16 @@
 
 
 ### Step 1 : Import Cross-Market Recommendations dataset into your Atlas Database
-> Download the US Home and Kitchen category dataset
+> Download the US Home and Kitchen/metadata category dataset.
 ```
 link: https://xmrec.github.io/data/us/
 ```
-
+> Create the following database and collection in Atlas
+```
+DB_NAME = hybrid_search_xmarket
+COLLECTION_NAME = hybrid_search_dataset
+```
+> Extract and import the data into the aforementioned collection using Compass or any other tools you see fit.
 
 ### Step 2: Edit the 
 ```
