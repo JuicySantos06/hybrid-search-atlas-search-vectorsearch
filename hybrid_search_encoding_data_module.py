@@ -3,20 +3,16 @@ from pymongo import MongoClient
 from pymongo.errors import OperationFailure
 import numpy
 
-#define global variables
 MONGODB_ATLAS_URI = "<EDIT_WITH_YOUR_PARAMETER>"
 DB_NAME = "hybrid_search_xmarket"
 COLLECTION_NAME = "hybrid_search_dataset"
 MONGODB_CLIENT = MongoClient(MONGODB_ATLAS_URI)
 
-#define model to be used for encoding product title field
 model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
 
-#define vector normalization
 def normalize_data(vectorData):
     return (vectorData/numpy.linalg.norm(vectorData))
 
-#define connection initialization
 def startup_db_connection():
     try:
         MONGODB_CLIENT.list_database_names()
@@ -25,15 +21,13 @@ def startup_db_connection():
     except OperationFailure as err:
         print (f"Datacase Connection failed. Error: {err}")
         return False
-
-#define client db initialization
+        
 def startup_db_client(resultingStartupDbConnection):
     if (resultingStartupDbConnection == True):
         mongodbDatabase = MONGODB_CLIENT[DB_NAME]
         mongodbCollection = mongodbDatabase[COLLECTION_NAME]
         return mongodbCollection
 
-#define groceryAndGourmetFood data embedding
 def data_product_embedding(resultingStartupDbClient):
     for doc in resultingStartupDbClient.find():
         try:
@@ -54,6 +48,7 @@ def data_product_embedding(resultingStartupDbClient):
 def main():
     data_product_embedding(startup_db_client(startup_db_connection()))
     print('Dataset embedding finished - congratulations')
+    
 if __name__ == "__main__":
     main()
     
