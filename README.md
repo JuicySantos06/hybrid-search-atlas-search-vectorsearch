@@ -36,4 +36,15 @@ python hybrid_search_encoding_data_module.py
 ```
 
 ### Step 4: Edit the hybrid_search_text_search_and_vector_search.py file
+> Update the mongodbAtlasUri parameter with your Atlas connection string.
+> Update the userQuery parameter with your query.
+> You can also change the number of results by updating the numOfResults parameter.
 
+### Step 5: Run the hybrid_search_text_search_and_vector_search.py file
+> Ensure that you have installed the relevant Python package beforehand.
+```
+pip install sentence-transformers
+pip install pymongo
+pip install pandas
+pip install requests
+```
