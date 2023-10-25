@@ -58,6 +58,7 @@ python hybrid_search_encoding_data_module.py
 ```
 
 ### Step 6: Create Atlas Vector Search index
+> Create the following Atlas Vector Search index.
 ```
 {
   "mappings": {
