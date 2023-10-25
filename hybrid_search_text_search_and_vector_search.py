@@ -8,8 +8,8 @@ import time
 
 #define global variables
 mongodbAtlasUri = "<UPDATE_WITH_YOUR_ATLAS_CONNECTION_STRING>"
-mongodbAtlasDatabase = "sample_xmarket"
-mongodbAtlasCollection = "homeAndKitchen"
+mongodbAtlasDatabase = "hybrid_search_xmarket"
+mongodbAtlasCollection = "hybrid_search_dataset"
 userQuery = "I want a spoon for ice cream"
 numOfResults = 10
 
