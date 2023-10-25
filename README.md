@@ -23,7 +23,7 @@ COLLECTION_NAME = hybrid_search_dataset
 ### Step 2: Edit the hybrid_search_encoding_data_module.py file
 > Update the MONGODB_ATLAS_URI parameter with your Atlas connection string.
 
-### Step 3: Run the the hybrid_search_encoding_data_module.py file
+### Step 3: Run the hybrid_search_encoding_data_module.py file
 > Ensure that you have installed the relevant Python package beforehand.
 ```
 pip install sentence-transformers
@@ -34,3 +34,6 @@ pip install numpy
 ```
 python hybrid_search_encoding_data_module.py
 ```
+
+### Step 4: Edit the hybrid_search_text_search_and_vector_search.py file
+
