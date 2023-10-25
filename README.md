@@ -58,7 +58,7 @@ python hybrid_search_encoding_data_module.py
 ```
 
 ### Step 6: Create Atlas Vector Search index
-
+```
 {
   "mappings": {
     "dynamic": true,
@@ -71,7 +71,7 @@ python hybrid_search_encoding_data_module.py
     }
   }
 }
-
+```
 
 ### Step 7: Run the hybrid_search_text_search_and_vector_search.py file
 > Ensure that you have installed the relevant Python package beforehand.
