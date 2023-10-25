@@ -40,7 +40,40 @@ python hybrid_search_encoding_data_module.py
 > Update the userQuery parameter with your query.
 > You can also change the number of results by updating the numOfResults parameter.
 
-### Step 5: Run the hybrid_search_text_search_and_vector_search.py file
+### Step 5: Create Atlas Search index
+> Create the following Atlas Search index.
+> Note that the index has to be linked to the right collection that is hybrid_search_dataset.
+> Here is the index definition.
+```
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "title": {
+        "type": "string"
+      }
+    }
+  }
+}
+```
+
+### Step 6: Create Atlas Vector Search index
+
+{
+  "mappings": {
+    "dynamic": true,
+    "fields": {
+      "descriptionVectorEmbedding": {
+        "dimensions": 384,
+        "similarity": "cosine",
+        "type": "knnVector"
+      }
+    }
+  }
+}
+
+
+### Step 7: Run the hybrid_search_text_search_and_vector_search.py file
 > Ensure that you have installed the relevant Python package beforehand.
 ```
 pip install sentence-transformers
