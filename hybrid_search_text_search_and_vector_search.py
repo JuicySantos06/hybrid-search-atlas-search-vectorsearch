@@ -5,12 +5,13 @@ from pymongo.collection import ObjectId, OperationFailure
 from sentence_transformers import SentenceTransformer
 import requests
 import time
+import numpy
 
 #define global variables
-mongodbAtlasUri = "<UPDATE_WITH_YOUR_ATLAS_CONNECTION_STRING>"
+mongodbAtlasUri = "mongodb+srv://akilsk:Sofia06061991.@cluster0.vdddl.mongodb.net/?retryWrites=true&w=majority"
 mongodbAtlasDatabase = "hybrid_search_xmarket"
 mongodbAtlasCollection = "hybrid_search_dataset"
-userQuery = "I want a spoon for ice cream"
+userQuery = "ice cream spon"
 numOfResults = 10
 
 #define html result file initialization - https://towardsdatascience.com/text-search-vs-vector-search-better-together-3bd48eb6132a
@@ -52,26 +53,29 @@ def mongodb_atlas_search_query(paramStartupDbClient,paramMongodbCollectionName,p
         searchResult = mongodbCollection.aggregate([
         {
             '$search': {
-                'text': {
+                 'text': {
                     'path': 'title', 
                     'query': paramUserQuery
                 }
             }
-        }, {
+        }, 
+        {
+            '$limit': int(paramNumOfResults)
+        },
+        {
             '$project': {
                 '_id': 1, 
-                'title': 1, 
+                'title': 1,
+                 
                 'score': {
                     '$meta': 'searchScore'
                 }
             }
-        }, {
+        }, 
+        {
             '$sort': {
                 'score': -1
             },
-        },
-        {
-            '$limit': int(paramNumOfResults)
         }
         ])
         return searchResult
@@ -113,7 +117,7 @@ def mongodb_atlas_vector_search_query(paramStartupDbClient,paramMongodbCollectio
                 'knnBeta': {
                     'vector': queryEmbedding, 
                     'path': 'descriptionVectorEmbedding',
-                    'k': int(paramNumOfResults)
+                    'k': paramNumOfResults
                 }
             }
         }, 
@@ -135,11 +139,11 @@ def mongodb_atlas_vector_search_query(paramStartupDbClient,paramMongodbCollectio
 def mongodb_atlas_cleanse_enrich(paramStartupDbClient,paramMongodbCollectionName):
     mongodbCollection = paramStartupDbClient[paramMongodbCollectionName]
     try:
-        print(f"cleansing and enriching {mongodbCollection}")
+        #print(f"cleansing and enriching {mongodbCollection}")
         result = mongodbCollection.aggregate([
             {
                     '$lookup': {
-                        'from': 'homeAndKitchen', 
+                        'from': mongodbAtlasCollection, 
                         'localField': '_id', 
                         'foreignField': '_id', 
                         'as': 'result', 
@@ -203,11 +207,15 @@ def main():
     init_result_file_html(userQuery)
     listOfHtmlFileResults = dict()
 
+    currMongoClient = startup_db_connection(mongodbAtlasUri)
+
     pandas.set_option('mode.chained_assignment',None)
 
     #ATLAS SEARCH
-    searchResultList = mongodb_atlas_search_query(startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase),mongodbAtlasCollection,userQuery,numOfResults)
+    searchResultList = mongodb_atlas_search_query(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,userQuery,numOfResults)
     searchResultDataFrame = pandas.DataFrame(list(searchResultList))
+    #print(searchResultDataFrame)
+
     searchResultMaxScore = searchResultDataFrame['score'].loc[searchResultDataFrame.index[0]]
     searchResultNumpyArray = searchResultDataFrame.to_numpy()
     
@@ -221,7 +229,7 @@ def main():
     dictOfProductImg = []
     for i in range(len(displaySearchResult)):
         productId = displaySearchResult['ID'].iloc[i]
-        for doc in mongodb_atlas_product_img_retrieval(startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase),mongodbAtlasCollection,productId):
+        for doc in mongodb_atlas_product_img_retrieval(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,productId):
             dictOfProductImg.append(doc['imgUrl'][0].split('"')[1])  
     displaySearchResult['IMAGE'] = dictOfProductImg
 
@@ -245,7 +253,10 @@ def main():
       
     #ATLAS VECTOR SEARCH
     userQueryVectorEmbedding = model.encode(userQuery)
-    vectorSearchResultList = mongodb_atlas_vector_search_query(startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase),mongodbAtlasCollection,userQueryVectorEmbedding.tolist(),numOfResults)
+    vectorSearchResultList = mongodb_atlas_vector_search_query(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,userQueryVectorEmbedding.tolist(),numOfResults)
+    
+    #print(vectorSearchResultList)
+
     vectorSearchResultDataFrame = pandas.DataFrame(list(vectorSearchResultList))
     vectorSearchResultMaxScore = vectorSearchResultDataFrame['score'].loc[searchResultDataFrame.index[0]]
     vectorSearchResultNumpyArray = vectorSearchResultDataFrame.to_numpy()
@@ -260,7 +271,7 @@ def main():
     dictOfProductImg = []
     for i in range(len(displayVectorSearchResult)):
         productId = displayVectorSearchResult['ID'].iloc[i]
-        for doc in mongodb_atlas_product_img_retrieval(startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase),mongodbAtlasCollection,productId):
+        for doc in mongodb_atlas_product_img_retrieval(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,productId):
             dictOfProductImg.append(doc['imgUrl'][0].split('"')[1])  
     displayVectorSearchResult['IMAGE'] = dictOfProductImg
 
@@ -285,10 +296,10 @@ def main():
 
     #CLEANSE AND ENRICH PREVIOUS RESULTS
     time.sleep(2)
-    mongodb_atlas_cleanse_enrich(startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase),"atlasSearchQueryResult")
+    mongodb_atlas_cleanse_enrich(startup_db_client(currMongoClient,mongodbAtlasDatabase),"atlasSearchQueryResult")
     #CLEANSE AND ENRICH PREVIOUS RESULTS
     time.sleep(2)
-    mongodb_atlas_cleanse_enrich(startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase),"atlasVectorSearchQueryResult")
+    mongodb_atlas_cleanse_enrich(startup_db_client(currMongoClient,mongodbAtlasDatabase),"atlasVectorSearchQueryResult")
 
     for key,value in listOfHtmlFileResults.items():
         insert_data_result_file(value,key)
