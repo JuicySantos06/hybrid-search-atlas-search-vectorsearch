@@ -89,9 +89,6 @@ pip install requests
 ```
 ice cream spon
 ```
-> The hybrid_search_results_v1.html gives you a set of results.
-> Here you can see that our vector search results are way off.
-> The user query embedding is so far away from what we are looking for - we did not account for any typo tolerance.
 
 ### Step 9: Version 2 of our hybrid search engine
 > Here we will be creating an enhanced Atlas Search index which will account for any user misspelling.
@@ -114,4 +111,9 @@ ice cream spon
     }
   }
 }
+```
+> Run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+> We will be looking for the following items:
+```
+ice cream spon
 ```
