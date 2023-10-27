@@ -7,10 +7,10 @@ import requests
 import time
 import numpy
 
-mongodbAtlasUri = "mongodb+srv://akilsk:Sofia06061991.@cluster0.vdddl.mongodb.net/?retryWrites=true&w=majority"
+mongodbAtlasUri = "<EDIT_WITH_YOUR_PARAMETER>"
 mongodbAtlasDatabase = "hybrid_search_xmarket"
 mongodbAtlasCollection = "hybrid_search_dataset"
-userQuery = "ice cream spon"
+userQuery = "<EDIT_WITH_YOUR_PARAMETER>"
 numOfResults = 10
 
 def init_result_file_html(paramQuery):
