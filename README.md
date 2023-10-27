@@ -112,7 +112,7 @@ ice cream spon
   }
 }
 ```
-> Run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+> Update and then run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
 > We will be looking for the following items:
 ```
 ice cream spon
