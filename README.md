@@ -82,3 +82,36 @@ pip install pymongo
 pip install pandas
 pip install requests
 ```
+
+### Step 8: Version 1 of our hybrid search engine
+> That first version uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
+> We will be looking for the following items:
+```
+ice cream spon
+```
+> The hybrid_search_results_v1.html gives you a set of results.
+> Here you can see that our vector search results are way off.
+> The user query embedding is so far away from what we are looking for - we did not account for any typo tolerance.
+
+### Step 9: Version 2 of our hybrid search engine
+> Here we will be creating an enhanced Atlas Search index which will account for any user misspelling.
+> Here is the index definition that needs to be created in Atlas Search.
+> Index name = searchIndex.
+```
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "title": [
+        {
+          "foldDiacritics": true,
+          "maxGrams": 15,
+          "minGrams": 2,
+          "tokenization": "edgeGram",
+          "type": "autocomplete"
+        }
+      ]
+    }
+  }
+}
+```
