@@ -44,6 +44,7 @@ python hybrid_search_encoding_data_module.py
 > Create the following Atlas Search index.
 > Note that the index has to be linked to the right collection that is hybrid_search_dataset.
 > Here is the index definition.
+> Index name = default.
 ```
 {
   "mappings": {
@@ -64,9 +65,9 @@ python hybrid_search_encoding_data_module.py
   "mappings": {
     "dynamic": true,
     "fields": {
-      "descriptionVectorEmbedding": {
+      "descriptionVectorEmbeddingNormalized": {
         "dimensions": 384,
-        "similarity": "cosine",
+        "similarity": "dotProduct",
         "type": "knnVector"
       }
     }
@@ -97,14 +98,6 @@ pip install requests
 > Create the following Atlas Search index.
 > Note that the index has to be linked to the right collection that is hybrid_search_dataset.
 > Here is the index definition.
-```
-
-```
-
-
-### Step 10: Version 2 of our hybrid search engine
-> Here we will be creating an enhanced Atlas Search index which will account for any user misspelling.
-> Here is the index definition that needs to be created in Atlas Search.
 > Index name = searchIndex.
 ```
 {
@@ -112,6 +105,9 @@ pip install requests
     "dynamic": false,
     "fields": {
       "title": [
+        {
+          "type": "string"
+        },
         {
           "foldDiacritics": true,
           "maxGrams": 15,
@@ -124,8 +120,8 @@ pip install requests
   }
 }
 ```
-> Update and then run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
-> We will be looking for the following items:
-```
-ice cream spon
-```
+
+### Step 10: Edit the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+> Update the mongodbAtlasUri parameter with your Atlas connection string.
+> Update the userQuery parameter with your query.
+> You can also change the number of results by updating the numOfResults parameter.
