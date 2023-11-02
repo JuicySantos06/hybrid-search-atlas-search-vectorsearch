@@ -40,7 +40,7 @@ python hybrid_search_encoding_data_module.py
 > Update the userQuery parameter with your query.
 > You can also change the number of results by updating the numOfResults parameter.
 
-### Step 5: Create Atlas Search index
+### Step 5: Create the following Atlas Search index for version 1 of our hybrid search engine
 > Create the following Atlas Search index.
 > Note that the index has to be linked to the right collection that is hybrid_search_dataset.
 > Here is the index definition.
@@ -57,7 +57,7 @@ python hybrid_search_encoding_data_module.py
 }
 ```
 
-### Step 6: Create Atlas Vector Search index
+### Step 6: Create the following Atlas Vector Search index for version 1 of our hybrid search engine
 > Create the following Atlas Vector Search index.
 ```
 {
@@ -85,10 +85,12 @@ pip install requests
 
 ### Step 8: Version 1 of our hybrid search engine
 > That first version uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
-> We will be looking for the following items:
+> Here are a sample of items we queried using that hybrid search engine:
 ```
 ice cream spon
 ```
+
+### Step 5: Create Atlas Search index
 
 ### Step 9: Version 2 of our hybrid search engine
 > Here we will be creating an enhanced Atlas Search index which will account for any user misspelling.
