@@ -88,10 +88,9 @@ pip install requests
 > That version 1 uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
 > Here are a sample of items we queried using that hybrid search engine:
 ```
-* ice cream spon
-* ice cram spon
-* ice cram scop
-* ice crem spad
+* I want an ice cream spoon
+* silver ice cream spoon
+* scoop for ice cream
 ```
 
 ### Step 9: Create the following Atlas Search index for version 2 of our hybrid search engine
