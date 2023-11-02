@@ -8,7 +8,7 @@
 * MongoDB Atlas Search
 * MongoDB Atlas Vector Search
 
-### Step 1 : Import Cross-Market Recommendations dataset into your Atlas Database
+### Step 1 : Import the Cross-Market Recommendations dataset into your Atlas Database
 > Download the US Home and Kitchen/metadata category dataset.
 ```
 link: https://xmrec.github.io/data/us/
@@ -74,7 +74,7 @@ python hybrid_search_encoding_data_module.py
 }
 ```
 
-### Step 7: Run the hybrid_search_text_search_and_vector_search.py file
+### Step 7: Install the following Python packages
 > Ensure that you have installed the relevant Python package beforehand.
 ```
 pip install sentence-transformers
@@ -83,16 +83,26 @@ pip install pandas
 pip install requests
 ```
 
-### Step 8: Version 1 of our hybrid search engine
-> That first version uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
+### Step 8: Run the hybrid_search_text_search_and_vector_search.py file
+> That version 1 uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
 > Here are a sample of items we queried using that hybrid search engine:
 ```
-ice cream spon
+* ice cream spon
+* ice cram spon
+* ice cram scop
+* ice crem spad
 ```
 
-### Step 5: Create Atlas Search index
+### Step 9: Create the following Atlas Search index for version 2 of our hybrid search engine
+> Create the following Atlas Search index.
+> Note that the index has to be linked to the right collection that is hybrid_search_dataset.
+> Here is the index definition.
+```
 
-### Step 9: Version 2 of our hybrid search engine
+```
+
+
+### Step 10: Version 2 of our hybrid search engine
 > Here we will be creating an enhanced Atlas Search index which will account for any user misspelling.
 > Here is the index definition that needs to be created in Atlas Search.
 > Index name = searchIndex.
