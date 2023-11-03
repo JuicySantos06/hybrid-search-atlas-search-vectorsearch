@@ -60,6 +60,7 @@ python hybrid_search_encoding_data_module.py
 
 ### Step 6: Create the following Atlas Vector Search index for version 1 of our hybrid search engine
 > Create the following Atlas Vector Search index.
+> Index name = vectorIndex.
 ```
 {
   "mappings": {
@@ -86,7 +87,7 @@ pip install requests
 
 ### Step 8: Run the hybrid_search_text_search_and_vector_search.py file
 > That version 1 uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
-> Here are a sample of items we queried using that hybrid search engine:
+> Here are a sample of items we queried:
 ```
 * I want an ice cream spoon
 * silver ice cream spoon
@@ -124,3 +125,12 @@ pip install requests
 > Update the mongodbAtlasUri parameter with your Atlas connection string.
 > Update the userQuery parameter with your query.
 > You can also change the number of results by updating the numOfResults parameter.
+
+### Step 11: Run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+> That version 2 uses an enhanced Atlas Search indexing feature (typo tolerance) which is then being injected into Atlas Vector Search query.
+> Here are a sample of items we queried:
+```
+* I want an ice cream spoon
+* silver ice cream spoon
+* scoop for ice cream
+```
