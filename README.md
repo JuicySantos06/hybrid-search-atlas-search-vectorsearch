@@ -132,5 +132,5 @@ pip install requests
 ```
 * I want an ice cream spoon
 * silvar ice crem spon
-* scoop for ice cream
+* scop for ice crem
 ```
