@@ -131,6 +131,6 @@ pip install requests
 > Here are a sample of items we queried:
 ```
 * I want an ice cream spoon
-* silver ice cream spoon
+* silvar ice crem spon
 * scoop for ice cream
 ```
