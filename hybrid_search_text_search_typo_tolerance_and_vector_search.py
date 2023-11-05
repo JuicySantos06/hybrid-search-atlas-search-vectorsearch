@@ -4,8 +4,6 @@ import pandas
 from pymongo.collection import ObjectId, OperationFailure
 from sentence_transformers import SentenceTransformer
 import requests
-import time
-import numpy
 
 mongodbAtlasUri = "<EDIT_WITH_YOUR_PARAMETER>"
 mongodbAtlasDatabase = "hybrid_search_xmarket"
@@ -40,21 +38,20 @@ def startup_db_client(paramStartupDbConnection,paramMongodbDatabaseName):
         mongodbDatabase = paramStartupDbConnection[paramMongodbDatabaseName]
         return mongodbDatabase
 
-def mongodb_atlas_search_query(paramStartupDbClient,paramMongodbCollectionName,paramUserQuery,paramNumOfResults):
+def mongodb_atlas_search_query_unique_result(paramStartupDbClient,paramMongodbCollectionName,paramUserQuery):
     mongodbCollection = paramStartupDbClient[paramMongodbCollectionName]
     try:
         searchResult = mongodbCollection.aggregate([
         {
             '$search': {
                 'index': 'searchIndex',
-                'autocomplete': {
+                'text': {
                     'path': 'title', 
                     'query': paramUserQuery,
-                    'tokenOrder': 'any',
                     'fuzzy': {
                         'maxEdits': 2,
-                        'prefixLength': 1,
-                        'maxExpansions': 2
+                        'prefixLength': 0,
+                        'maxExpansions': 100
                         
                     }
                 },
@@ -64,22 +61,68 @@ def mongodb_atlas_search_query(paramStartupDbClient,paramMongodbCollectionName,p
             }
         }, 
         {
-            '$limit': int(paramNumOfResults)
-        },
-        {
             '$project': {
                 '_id': 1, 
                 'title': 1,
-                 
+                'highlights':{
+                    '$meta': "searchHighlights"
+                } ,
                 'score': {
                     '$meta': 'searchScore'
                 }
             }
-        }, 
+        },
         {
             '$sort': {
                 'score': -1
-            },
+            }
+        }, 
+        {
+            '$limit': 1
+        }
+        ])
+        return searchResult
+    except OperationFailure as err:
+        print (f"Error related to mongodb_atlas_search_query function: {err}")
+
+def mongodb_atlas_search_query(paramStartupDbClient,paramMongodbCollectionName,paramUserQuery,paramNumOfResults):
+    mongodbCollection = paramStartupDbClient[paramMongodbCollectionName]
+    try:
+        searchResult = mongodbCollection.aggregate([
+        {
+            '$search': {
+                'index': 'searchIndex',
+                'text': {
+                    'path': 'title', 
+                    'query': paramUserQuery,
+                    'fuzzy': {
+                        'maxEdits': 2,
+                        'prefixLength': 0,
+                        'maxExpansions': 100
+                        
+                    }
+                },
+                'highlight': {
+                    'path': 'title'
+                }
+            }
+        }, 
+        {
+            '$project': {
+                '_id': 1, 
+                'title': 1,
+                'score': {
+                    '$meta': 'searchScore'
+                }
+            }
+        },
+        {
+            '$sort': {
+                'score': -1
+            }
+        }, 
+        {
+            '$limit': paramNumOfResults
         }
         ])
         return searchResult
@@ -118,7 +161,7 @@ def mongodb_atlas_vector_search_query(paramStartupDbClient,paramMongodbCollectio
                 'index': 'vectorIndex',
                 'knnBeta': {
                     'vector': queryEmbedding, 
-                    'path': 'descriptionVectorEmbedding',
+                    'path': 'descriptionVectorEmbeddingNormalized',
                     'k': paramNumOfResults
                 }
             }
@@ -140,7 +183,6 @@ def mongodb_atlas_vector_search_query(paramStartupDbClient,paramMongodbCollectio
 def mongodb_atlas_cleanse_enrich(paramStartupDbClient,paramMongodbCollectionName):
     mongodbCollection = paramStartupDbClient[paramMongodbCollectionName]
     try:
-        #print(f"cleansing and enriching {mongodbCollection}")
         result = mongodbCollection.aggregate([
             {
                     '$lookup': {
@@ -188,7 +230,7 @@ def mongodb_atlas_cleanse_enrich(paramStartupDbClient,paramMongodbCollectionName
         return result
     except OperationFailure as err:
         print (f"Error related to mongodb_atlas_cleanse_enrich function: {err}")
-    
+
 def download_product_image(paramUrl,paramFileName):
     url = paramUrl
     file_name = "./" + paramFileName
@@ -213,12 +255,10 @@ def main():
     searchResultDataFrame = pandas.DataFrame(list(searchResultList))
     searchResultMaxScore = searchResultDataFrame['score'].loc[searchResultDataFrame.index[0]]
     searchResultNumpyArray = searchResultDataFrame.to_numpy()
-    
     for searchResultDataFrameRow in searchResultDataFrame.itertuples():
         currScore = searchResultDataFrame.at[searchResultDataFrameRow.Index,'score']
         normalizedScore = (currScore/searchResultMaxScore)
         searchResultNumpyArray[searchResultDataFrameRow.Index,2] = normalizedScore
-    
     displaySearchResult = pandas.DataFrame(searchResultNumpyArray,columns=['ID','NAME','SCORE'])
     displaySearchResult['IMAGE'] = None
     dictOfProductImg = []
@@ -228,12 +268,11 @@ def main():
             dictOfProductImg.append(doc['imgUrl'][0].split('"')[1])  
     displaySearchResult['IMAGE'] = dictOfProductImg
     listOfHtmlFileResults["MongoDB Atlas Search Results"] = displaySearchResult.to_html(escape=False,formatters=dict(IMAGE=to_img_tag))
-
+    
     #WRITE ATLAS SEARCH RESULT INTO MONGODB COLLECTION
     dbCursor = startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase)
     collCursor = dbCursor["atlasSearchQueryResult"]
-    collCursor.drop()
-        
+    collCursor.drop()  
     for i in range(len(displaySearchResult)):
         try:
             collCursor.insert_one({
@@ -246,7 +285,19 @@ def main():
             print(f"Error related to mongodb_atlas_product_img_retrieval function: {err}")
       
     #ATLAS VECTOR SEARCH
-    userQueryVectorEmbedding = model.encode(userQuery)
+    correctedUserQuery = []
+    uniqueSearchResult = mongodb_atlas_search_query_unique_result(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,userQuery)
+    vectorSearchItemsLit = []
+    for doc in uniqueSearchResult:
+        #f = doc["highlights"][0]["texts"]
+        for searchItems in doc["highlights"][0]["texts"]:
+            if searchItems["type"] == "hit":
+                vectorSearchItemsLit.append(searchItems["value"])
+                #correctedUserQuery = searchItems["value"]
+                #print(correctedUserQuery)
+
+    correctedUserQuery =' '.join(map(str,vectorSearchItemsLit))
+    userQueryVectorEmbedding = model.encode(correctedUserQuery)
     vectorSearchResultList = mongodb_atlas_vector_search_query(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,userQueryVectorEmbedding.tolist(),numOfResults)
     vectorSearchResultDataFrame = pandas.DataFrame(list(vectorSearchResultList))
     vectorSearchResultMaxScore = vectorSearchResultDataFrame['score'].loc[searchResultDataFrame.index[0]]
@@ -271,7 +322,6 @@ def main():
     dbCursor = startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase)
     collCursor = dbCursor["atlasVectorSearchQueryResult"]
     collCursor.drop()
-
     for i in range(len(displaySearchResult)):
         try:
             collCursor.insert_one({
