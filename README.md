@@ -107,13 +107,6 @@ pip install requests
       "title": [
         {
           "type": "string"
-        },
-        {
-          "foldDiacritics": true,
-          "maxGrams": 15,
-          "minGrams": 2,
-          "tokenization": "edgeGram",
-          "type": "autocomplete"
         }
       ]
     }
@@ -130,7 +123,7 @@ pip install requests
 > That version 2 uses an enhanced Atlas Search indexing feature (typo tolerance) which is then being injected into Atlas Vector Search query.
 > Here are a sample of items we queried:
 ```
-* I want an ice cream spoon
+* eye want an ice cram spoo
 * silvar ice crem spon
 * scop for ice crem
 ```
