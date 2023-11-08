@@ -5,10 +5,8 @@ from pymongo.collection import ObjectId, OperationFailure
 from sentence_transformers import SentenceTransformer
 import requests
 
-mongodbAtlasUri = "<EDIT_WITH_YOUR_PARAMETER>"
 mongodbAtlasDatabase = "hybrid_search_xmarket"
 mongodbAtlasCollection = "hybrid_search_dataset"
-userQuery = "<EDIT_WITH_YOUR_PARAMETER>"
 numOfResults = 10
 
 def init_result_file_html(paramQuery):
@@ -234,7 +232,6 @@ def mongodb_atlas_cleanse_enrich(paramStartupDbClient,paramMongodbCollectionName
 def download_product_image(paramUrl,paramFileName):
     url = paramUrl
     file_name = "./" + paramFileName
-
     res = requests.get(url, stream = True).content
     with open(file_name,'wb') as f:
         f.write(res)
@@ -245,6 +242,8 @@ def to_img_tag(path):
     return '<img src="'+ path + '"width=50">'
     
 def main():
+    mongodbAtlasUri = input("Enter MongoDB Atlas connection string: ")
+    userQuery = input("Enter search item: ")
     init_result_file_html(userQuery)
     listOfHtmlFileResults = dict()
     currMongoClient = startup_db_connection(mongodbAtlasUri)
@@ -258,7 +257,7 @@ def main():
     for searchResultDataFrameRow in searchResultDataFrame.itertuples():
         currScore = searchResultDataFrame.at[searchResultDataFrameRow.Index,'score']
         normalizedScore = (currScore/searchResultMaxScore)
-        searchResultNumpyArray[searchResultDataFrameRow.Index,2] = normalizedScore
+        searchResultNumpyArray[searchResultDataFrameRow.Index,2] = normalizedScore  
     displaySearchResult = pandas.DataFrame(searchResultNumpyArray,columns=['ID','NAME','SCORE'])
     displaySearchResult['IMAGE'] = None
     dictOfProductImg = []
@@ -267,9 +266,7 @@ def main():
         for doc in mongodb_atlas_product_img_retrieval(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,productId):
             dictOfProductImg.append(doc['imgUrl'][0].split('"')[1])  
     displaySearchResult['IMAGE'] = dictOfProductImg
-    listOfHtmlFileResults["MongoDB Atlas Search Results"] = displaySearchResult.to_html(escape=False,formatters=dict(IMAGE=to_img_tag))
-    
-    #WRITE ATLAS SEARCH RESULT INTO MONGODB COLLECTION
+    listOfHtmlFileResults["MongoDB Atlas Search Results"] = displaySearchResult.to_html(escape=False,formatters=dict(IMAGE=to_img_tag)) 
     dbCursor = startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase)
     collCursor = dbCursor["atlasSearchQueryResult"]
     collCursor.drop()  
@@ -289,25 +286,19 @@ def main():
     uniqueSearchResult = mongodb_atlas_search_query_unique_result(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,userQuery)
     vectorSearchItemsLit = []
     for doc in uniqueSearchResult:
-        #f = doc["highlights"][0]["texts"]
         for searchItems in doc["highlights"][0]["texts"]:
             if searchItems["type"] == "hit":
                 vectorSearchItemsLit.append(searchItems["value"])
-                #correctedUserQuery = searchItems["value"]
-                #print(correctedUserQuery)
-
     correctedUserQuery =' '.join(map(str,vectorSearchItemsLit))
     userQueryVectorEmbedding = model.encode(correctedUserQuery)
     vectorSearchResultList = mongodb_atlas_vector_search_query(startup_db_client(currMongoClient,mongodbAtlasDatabase),mongodbAtlasCollection,userQueryVectorEmbedding.tolist(),numOfResults)
     vectorSearchResultDataFrame = pandas.DataFrame(list(vectorSearchResultList))
     vectorSearchResultMaxScore = vectorSearchResultDataFrame['score'].loc[searchResultDataFrame.index[0]]
     vectorSearchResultNumpyArray = vectorSearchResultDataFrame.to_numpy()
-    
     for vectorSearchResultDataFrameRow in vectorSearchResultDataFrame.itertuples():
         currScore = vectorSearchResultDataFrame.at[vectorSearchResultDataFrameRow.Index,'score']
         normalizedScore = (currScore/vectorSearchResultMaxScore)
         vectorSearchResultNumpyArray[vectorSearchResultDataFrameRow.Index,2] = normalizedScore
-
     displayVectorSearchResult = pandas.DataFrame(vectorSearchResultNumpyArray,columns=['ID','NAME','SCORE'])
     displayVectorSearchResult['IMAGE'] = None
     dictOfProductImg = []
@@ -317,8 +308,6 @@ def main():
             dictOfProductImg.append(doc['imgUrl'][0].split('"')[1])  
     displayVectorSearchResult['IMAGE'] = dictOfProductImg
     listOfHtmlFileResults["MongoDB Atlas Vector Search Results"] = displayVectorSearchResult.to_html(escape=False,formatters=dict(IMAGE=to_img_tag))
-
-    #WRITE ATLAS VECTOR SEARCH RESULT INTO MONGODB COLLECTION
     dbCursor = startup_db_client(startup_db_connection(mongodbAtlasUri),mongodbAtlasDatabase)
     collCursor = dbCursor["atlasVectorSearchQueryResult"]
     collCursor.drop()
