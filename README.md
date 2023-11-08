@@ -7,6 +7,7 @@
 > We will be using using the following native MongoDB technologies:
 * MongoDB Atlas Search
 * MongoDB Atlas Vector Search
+> Beforehand, we will be looking at the first generation of text search in order to appreciate the fantastic technology evolution we have delivered throughout MongoDB.
 
 ### Step 1 : Import the Cross-Market Recommendations dataset into your Atlas Database
 > Download the US Home and Kitchen/metadata category dataset.
@@ -20,6 +21,7 @@ COLLECTION_NAME = hybrid_search_dataset
 ```
 > Extract and import the data into the aforementioned collection using Compass or any other tools you see fit.
 
+### Step 2: 
 ### Step 2: Edit the hybrid_search_encoding_data_module.py file
 > Update the MONGODB_ATLAS_URI parameter with your Atlas connection string.
 
@@ -35,10 +37,8 @@ pip install numpy
 python hybrid_search_encoding_data_module.py
 ```
 
-### Step 4: Edit the hybrid_search_text_search_and_vector_search.py file
-> Update the mongodbAtlasUri parameter with your Atlas connection string.
-> Update the userQuery parameter with your query.
-> You can also change the number of results by updating the numOfResults parameter.
+### Step 4 (Optional): Edit the hybrid_search_text_search_and_vector_search.py file
+> You can change the number of results by updating the numOfResults parameter.
 
 ### Step 5: Create the following Atlas Search index for version 1 of our hybrid search engine
 > Create the following Atlas Search index.
@@ -114,10 +114,8 @@ pip install requests
 }
 ```
 
-### Step 10: Edit the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
-> Update the mongodbAtlasUri parameter with your Atlas connection string.
-> Update the userQuery parameter with your query.
-> You can also change the number of results by updating the numOfResults parameter.
+### Step 10 (Optional): Edit the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+> You can change the number of results by updating the numOfResults parameter.
 
 ### Step 11: Run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
 > That version 2 uses an enhanced Atlas Search indexing feature (typo tolerance) which is then being injected into Atlas Vector Search query.
@@ -127,3 +125,7 @@ pip install requests
 * silvar ice crem spon
 * scop for ice crem
 ```
+
+## Conclusion
+
+
