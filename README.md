@@ -21,11 +21,35 @@ COLLECTION_NAME = hybrid_search_dataset
 ```
 > Extract and import the data into the aforementioned collection using Compass or any other tools you see fit.
 
-### Step 2: 
-### Step 2: Edit the hybrid_search_encoding_data_module.py file
+## Search technology gen0
+
+### Step 2: Create a text index on the field title
+> Choose whichever methods you see fit to create the aforementionned a text index on the aforementionned field.
+> hybrid_search_xmarket.hybrid_search_dataset.createIndex( { "title": “text” } )
+
+### Step 3: Install the following Python packages
+> Ensure that you have installed the relevant Python package beforehand.
+```
+pip install pymongo
+pip install pandas
+pip install requests
+```
+
+### Step 4: Run the text_search.py file
+> That version 1 uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
+> Here are a sample of items we queried:
+```
+* I want an ice cream spoon
+* silver ice cream spoon
+* scoop for ice cream
+```
+
+## Search technology gen1
+
+### Step 5: Edit the hybrid_search_encoding_data_module.py file
 > Update the MONGODB_ATLAS_URI parameter with your Atlas connection string.
 
-### Step 3: Run the hybrid_search_encoding_data_module.py file
+### Step 6: Run the hybrid_search_encoding_data_module.py file
 > Ensure that you have installed the relevant Python package beforehand.
 ```
 pip install sentence-transformers
@@ -37,10 +61,10 @@ pip install numpy
 python hybrid_search_encoding_data_module.py
 ```
 
-### Step 4 (Optional): Edit the hybrid_search_text_search_and_vector_search.py file
+### Step 7 (Optional): Edit the hybrid_search_text_search_and_vector_search.py file
 > You can change the number of results by updating the numOfResults parameter.
 
-### Step 5: Create the following Atlas Search index for version 1 of our hybrid search engine
+### Step 8: Create the following Atlas Search index for version 1 of our hybrid search engine
 > Create the following Atlas Search index.
 > Note that the index has to be linked to the right collection that is hybrid_search_dataset.
 > Here is the index definition.
@@ -58,7 +82,7 @@ python hybrid_search_encoding_data_module.py
 }
 ```
 
-### Step 6: Create the following Atlas Vector Search index for version 1 of our hybrid search engine
+### Step 9: Create the following Atlas Vector Search index for version 1 of our hybrid search engine
 > Create the following Atlas Vector Search index.
 > Index name = vectorIndex.
 ```
@@ -76,7 +100,7 @@ python hybrid_search_encoding_data_module.py
 }
 ```
 
-### Step 7: Install the following Python packages
+### Step 10: Install the following Python packages
 > Ensure that you have installed the relevant Python package beforehand.
 ```
 pip install sentence-transformers
@@ -85,7 +109,7 @@ pip install pandas
 pip install requests
 ```
 
-### Step 8: Run the hybrid_search_text_search_and_vector_search.py file
+### Step 11: Run the hybrid_search_text_search_and_vector_search.py file
 > That version 1 uses a basic Atlas Search indexing feature (no typo tolerance, autocomplete, whatsover).
 > Here are a sample of items we queried:
 ```
@@ -94,7 +118,9 @@ pip install requests
 * scoop for ice cream
 ```
 
-### Step 9: Create the following Atlas Search index for version 2 of our hybrid search engine
+## Search technology gen2
+
+### Step 12: Create the following Atlas Search index for version 2 of our hybrid search engine
 > Create the following Atlas Search index.
 > Note that the index has to be linked to the right collection that is hybrid_search_dataset.
 > Here is the index definition.
@@ -114,10 +140,10 @@ pip install requests
 }
 ```
 
-### Step 10 (Optional): Edit the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+### Step 13 (Optional): Edit the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
 > You can change the number of results by updating the numOfResults parameter.
 
-### Step 11: Run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
+### Step 14: Run the hybrid_search_text_search_typo_tolerance_and_vector_search.py file
 > That version 2 uses an enhanced Atlas Search indexing feature (typo tolerance) which is then being injected into Atlas Vector Search query.
 > Here are a sample of items we queried:
 ```
@@ -125,7 +151,5 @@ pip install requests
 * silvar ice crem spon
 * scop for ice crem
 ```
-
-## Conclusion
 
 
