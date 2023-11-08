@@ -152,4 +152,5 @@ pip install requests
 * scop for ice crem
 ```
 
-
+## Conclusion
+> This demonstration shows the evolution of search technologies and the complementarity of keyword-based and semantic-based search technology in order to provide the most accurate search capability for your customers.
